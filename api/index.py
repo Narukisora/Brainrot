@@ -4,8 +4,12 @@ import requests
 app = Flask(__name__)
 
 @app.route("/")
-def home():
-    return render_template("index.html")
+def login_page():
+    return render_template("login.html")
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
 @app.route("/check_user", methods=["POST"])
 def check_user():
@@ -15,7 +19,7 @@ def check_user():
     if not username:
         return jsonify({"error": "No username provided"}), 400
 
-    # Step 1: Get UserId from Roblox API
+    # Step 1: Get UserId
     user_lookup = requests.post(
         "https://users.roblox.com/v1/usernames/users",
         json={"usernames": [username]},
@@ -34,8 +38,4 @@ def check_user():
 
     avatar_url = avatar_res["data"][0]["imageUrl"]
 
-    return jsonify({
-        "found": True,
-        "userId": user_id,
-        "avatarUrl": avatar_url
-    })
+    return jsonify({"found": True, "userId": user_id, "avatarUrl": avatar_url})
