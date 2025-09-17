@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+    #avatar { margin: 20px auto; width: 150px; height: 150px; border-radius: 50%; border: 2px solid #333; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Enter Roblox Username">
+  <button onclick="searchUser()">Search</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function searchUser() {
+      const username = document.getElementById("username").value.trim();
+      const result = document.getElementById("result");
+
+      if (!username) {
+        result.innerHTML = "<p>Please enter a username!</p>";
+        return;
+      }
+
+      const res = await fetch("/check_user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      });
+
+      const data = await res.json();
+
+      if (!data.found) {
+        result.innerHTML = "<p>No User Has Been Found!</p>";
+        return;
+      }
+
+      // Save username + avatar in localStorage
+      localStorage.setItem("username", username);
+      localStorage.setItem("avatar", data.avatarUrl);
+
+      result.innerHTML = `
+        <img id="avatar" src="${data.avatarUrl}" alt="User Avatar">
+        <br><button onclick="login()">Log In</button>
+      `;
+    }
+
+    function login() {
+      window.location.href = "/dashboard"; // Flask route
+    }
+  </script>
+
+</body>
+</html>
