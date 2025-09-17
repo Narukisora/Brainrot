@@ -1,7 +1,10 @@
+import os
 from flask import Flask, render_template, request, jsonify
 import requests
 
-app = Flask(__name__)
+# Explicitly point Flask to templates folder
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "../templates")
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
 @app.route("/")
 def login_page():
@@ -19,7 +22,7 @@ def check_user():
     if not username:
         return jsonify({"error": "No username provided"}), 400
 
-    # Step 1: Get UserId
+    # Step 1: Roblox username → UserId
     user_lookup = requests.post(
         "https://users.roblox.com/v1/usernames/users",
         json={"usernames": [username]},
@@ -39,3 +42,7 @@ def check_user():
     avatar_url = avatar_res["data"][0]["imageUrl"]
 
     return jsonify({"found": True, "userId": user_id, "avatarUrl": avatar_url})
+
+# ✅ Needed for local testing
+if __name__ == "__main__":
+    app.run(debug=True)
